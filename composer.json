@@ -1,5 +1,10 @@
 {
     "require": {
-        "silex/silex": "~2.0"
+        "silex/silex": "~2.0",
+        "twig/twig": "^2.4",
+        "vanpattenmedia/twig-pluralize-extension": "^1.0",
+        "twig/extensions": "^1.5",
+        "doctrine/dbal": "~2.5",
+        "symfony/yaml": "~4.1"
     }
 }
