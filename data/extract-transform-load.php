@@ -1,8 +1,6 @@
 <?php
 
-// This script extracts data from the official Hacker News API (v0)
-// for a certain list of item-IDs. The data can then be transformed
-// and loaded in a MySQL database.
+
 
 ob_implicit_flush(true);
 
@@ -38,7 +36,7 @@ function insert_database(stdClass $item, int $parent_id = null) {
     $score       = get_property($item, 'score');
     $descendants = get_property($item, 'descendants');
     
-    $values = [
+    $values = array(
         $item->id,
         $parent_id,
         $item->type,
@@ -49,23 +47,23 @@ function insert_database(stdClass $item, int $parent_id = null) {
         $url,
         $score,
         $descendants
-    ];
+    );
     
     $sth = pdo_query($sql, $values);
     
     echo '.';
     
-    if (property_exists($item, 'kids') && count($item->kids) > 0) {
+    if ( property_exists($item, 'kids') && count($item->kids) > 0 ) {
         foreach ($item->kids as $id) {
             $json = get_item($id);
             $json && insert_database($json, $item->id);
         }
     }
     
-    return ($sth->rowCount() > 0);
+    return ( $sth->rowCount() > 0 );
 }
 
-function pdo_connect($hostname, $username, $password, $database) {
+function pdo_connect( $hostname, $username, $password, $database ) {
     try {
         return new PDO("mysql:dbname=$database;host=$hostname", $username, $password);
     } catch (PDOException $e) {
