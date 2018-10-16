@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+    {% block main %}
+    
+      <div class="panel panel-default">
+        <div class="panel-body">
+        
+        <p>
+          <strong><a href="{{ story.url }}">{{ story.title }}</a></strong><br>
+          <small>
+            {{ pluralize(story.score, '1 point', '%d points') }} by {{ story.username }} 
+            {{ story.timestamp|time_diff }} | {{ pluralize(story.descendants, '1 comment', '%d comments') }}
+          </small>
+        </p>
+        
+        {% if story.content is not empty %}{{ story.content|raw }}{% endif %}
+        
+        {% set parent = 1 %}
+        {% for comment in comments %}
+          {% set node = (comment.level == 1) ? 'parent' : 'child' %}
+          
+          {# Children are nested in divs of parents #}
+          {% if not loop.first %}
+            {% if comment.level > parent %}
+              <div class="children">
+            {% elseif comment.level == parent %}
+              </div>
+            {% else %}
+              {% for i in 0..(parent - comment.level) %}</div>{% endfor %}
+            {% endif %}
+          {% endif %}
+          {% set parent = comment.level %}
+        
+          <div id="node-{{ loop.index }}" class="{{ node }}-{{ comment.level }}">
+            <hr>
+            <div class="item-rank"><span class="glyphicon glyphicon-triangle-top"></span></div>
+            <div class="item-text">
+              <small>
+                {{ comment.username }} | {{ comment.timestamp|time_diff }} 
+                <a class="toggle" data-index="{{ loop.index }}">[-]</a>
+              </small><br>
+              <span id="comment-{{ loop.index }}">{{ comment.content|raw }}</span>
+            </div>
+            
+        {% else %}
+          No comments have been found.
+        {% endfor %}  
+        
+        </div>
+      </div>
+      
+    {% endblock %}
+    
+    {% block javascript %}
+      <script>
+        $('a.toggle').click(function() {
+          var index = $(this).data('index');
+          var hidden = 1;
+          var comment = $('#comment-' + index);
+          var node = $('#node-' + index);
+          var children = node.find('div.children');
+          // Toggle visibility of comment
+          comment.toggle();
+          // Toggle visibility of children
+          if (children) {
+            children.toggle();
+            hidden += children.find('div[id^=node]').length
+          };
+          // Toggle hyperlink text
+          if (comment.is(':visible')) {
+            $(this).text('[-]');
+          } else {
+            $(this).text('[+' + hidden + ']');
+          }
+        });
+      </script>
+    {% endblock %}

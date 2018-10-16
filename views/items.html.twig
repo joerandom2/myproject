@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+    {% block main %}
+    
+      {% for item in items %}
+      {% set comments_url = app.url_generator.generate('comments', { item_id: item.id }) %}
+      <div class="panel panel-default">
+        <div class="panel-body">
+    
+          <button type="button" class="btn btn-default btn-sm pull-right">
+            <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
+          </button>
+          
+          <button type="button" class="btn btn-default btn-sm pull-right">
+            <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+          </button>
+          
+          <div class="item-rank">{{ loop.index }}.</div>
+          <div class="item-text">
+            <a href="{{ item.url is empty ? comments_url : item.url }}">{{ item.title }}</a><br>
+            <small>
+              {{ pluralize(item.score, '1 point', '%d points') }} by {{ item.username }} 
+              {{ item.timestamp|time_diff }} | 
+              <a href="{{ comments_url }}">{{ pluralize(item.descendants, '1 comment', '%d comments') }}</a>
+            </small>
+          </div>
+          
+        </div>
+      </div>
+      {% else %}
+        No items have been found.
+      {% endfor %}
+    
+    {% endblock %}
